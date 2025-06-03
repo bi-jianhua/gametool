@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狼人杀发言顺序生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 60px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>狼人杀发言顺序生成器</h1>
+        <p>设置玩家数量，随机决定从几号玩家的左边或右边开始发言，并随机顺时针或逆时针发言</p>
+        
+        <div>
+            <label for="playerCount">玩家数量：</label>
+            <input type="number" id="playerCount" min="4" max="20" value="12">
+        </div>
+        
+        <button onclick="generateSpeakingOrder()">随机生成发言顺序</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function generateSpeakingOrder() {
+            const playerCount = parseInt(document.getElementById("playerCount").value);
+            
+            if (playerCount < 4 || playerCount > 20) {
+                alert("玩家数量应在4~20之间！");
+                return;
+            }
+            
+            // 随机选择一个玩家（1 ~ playerCount）
+            const randomPlayer = Math.floor(Math.random() * playerCount) + 1;
+            
+            // 随机选择左边或右边（0: 左边，1: 右边）
+            const direction = Math.floor(Math.random() * 2);
+            const directionText = direction === 0 ? "左边" : "右边";
+            
+            // 计算第一个发言的玩家
+            let firstSpeaker;
+            if (direction === 0) {
+                firstSpeaker = randomPlayer === 1 ? playerCount : randomPlayer - 1;
+            } else {
+                firstSpeaker = randomPlayer === playerCount ? 1 : randomPlayer + 1;
+            }
+            
+            // 随机选择顺时针或逆时针（0: 顺时针，1: 逆时针）
+            const rotation = Math.floor(Math.random() * 2);
+            const rotationText = rotation === 0 ? "顺时针" : "逆时针";
+            
+            const resultText = `
+                <p>随机选择：从 <strong>${randomPlayer}号玩家</strong> 的 <strong>${directionText}</strong> 开始发言</p>
+                <p>发言方向：<strong>${rotationText}</strong></p>
+                <p>第一个发言的玩家是：<strong>${firstSpeaker}号</strong></p>
+                <p>发言顺序：${generateOrderList(firstSpeaker, playerCount, rotation)}</p>
+            `;
+            
+            document.getElementById("result").innerHTML = resultText;
+        }
+        
+        // 生成发言顺序列表（根据 rotation 决定方向）
+        function generateOrderList(firstSpeaker, playerCount, rotation) {
+            let order = [];
+            if (rotation === 0) {
+                // 顺时针（默认顺序）
+                for (let i = 0; i < playerCount; i++) {
+                    let currentPlayer = (firstSpeaker + i - 1) % playerCount + 1;
+                    order.push(currentPlayer);
+                }
+            } else {
+                // 逆时针（反向顺序）
+                for (let i = 0; i < playerCount; i++) {
+                    let currentPlayer = (firstSpeaker - i - 1 + playerCount) % playerCount + 1;
+                    order.push(currentPlayer);
+                }
+            }
+            return order.join(" → ");
+        }
+    </script>
+</body>
+</html>
